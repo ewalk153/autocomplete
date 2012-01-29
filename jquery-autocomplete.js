@@ -48,6 +48,8 @@
     splitChr:null,    // used character to split data (default is \n)
     autohide: false,  // autohide if not hover : 0 / false : not used, > 0 : delay in ms
     loop: true,       // up / down loop 
+    tabSelect: false  // tab key selects current element and moves to the next field
+    autoSelect: false // if no item is selected, pick first options when user hits tab or return key
     className : namespace
   };  
   
@@ -240,7 +242,16 @@
     this.key = function(e){
       var c = e.keyCode, next;
       if (c === 9) { // tab
-        // do nothing
+        if (tabSelect) {
+          if (autoSelect && iHover == -1) {
+            iHover = 0;
+          }
+          if (iHover !== -1){
+            this.select(iHover, $('li', $list).eq(iHover).text());
+            e.preventDefault();
+            e.stopImmediatePropagation();
+          }
+        }
       } else if (!$list && (c !== 27) && (c !== 13)){ // completion empty and not [esc] or [enter]
         this.updateTOComplete();
       } else if ( (c === 38) || (c === 40) ){ // up / down
@@ -263,6 +274,9 @@
         }
         e.preventDefault();
       } else if (c === 13){ // enter
+        if (autoSelect && iHover == -1) {
+          iHover = 0;
+        }
         if (iHover !== -1){
           this.select(iHover, $('li', $list).eq(iHover).text());
           e.preventDefault();
